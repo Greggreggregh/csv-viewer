@@ -18,10 +18,10 @@ function App() {
         const columnsArray = [];
         const valuesArray = [];
 
-        results.data.map((d) => {
+        results.data.forEach((d) => {
           columnsArray.push(Object.keys(d));
           valuesArray.push(Object.values(d));
-        });
+      });
 
         setTableColumns(columnsArray[0]);
 
