@@ -1,0 +1,23 @@
+h1 {
+  margin: 15px 0;
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.file-upload {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.data-table {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.data-table td {
+  padding: 2px 20px;
+}
