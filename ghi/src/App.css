@@ -1,23 +1,90 @@
+body {
+  background-color: #FFFFFF;
+}
+
 h1 {
   margin: 15px 0;
 }
 
 h3 {
   margin-top: 0;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
+  font-weight: 600;
 }
 
-.file-upload {
+input[type="file"] {
+  display: none;
+}
+
+.title-section {
   text-align: center;
   margin-bottom: 25px;
 }
 
-.data-table {
-  display: flex;
-  justify-content: center;
-  text-align: center;
+.active-file-upload-download {
+  background-color: #1e96fc;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #1e96fc;
+  padding: 5px 15px;
+  margin: 5px;
+  color: #FFFFFF;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.innactive-button {
+  background-color: #cccccc;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #cccccc;
+  padding: 5px 15px;
+  margin: 5px;
+  color: #777777;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+@media (max-height: 800px) {
+  .data-table {
+    width: min-content;
+    max-width: 95vw;
+    height: 75vh;
+    overflow: scroll;
+    margin: auto;
+  }
+}
+
+@media (min-height: 800px) {
+  .data-table {
+    width: min-content;
+    max-width: 95vw;
+    max-height: 80vh;
+    overflow: scroll;
+    margin: auto;
+  }
+}
+
+thead tr {
+  background-color: #fcefb4;
+}
+
+tbody tr {
+  background-color: #fdf8e1;
+}
+
+.data-table th {
+  padding: 2px 20px;
+  white-space: nowrap;
 }
 
 .data-table td {
   padding: 2px 20px;
+  overflow: auto;
+  text-align: center;
+}
+
+.data-table button {
+  border: none;
+  background-color: transparent;
 }

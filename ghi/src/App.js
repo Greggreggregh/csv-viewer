@@ -1,67 +1,132 @@
 import './App.css';
 import Papa from 'papaparse';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { CSVLink } from 'react-csv';
+
+
+// Sorts data according to the sortKey and sortOrder
+function sortData(values, sortKey, sortOrder) {
+  if (!sortKey && sortKey !== 0) {
+    return values
+  }
+
+  const sortedData = values.sort((a,b) => {
+    return a[sortKey] > b[sortKey] ? 1 : -1
+  })
+
+  if (sortOrder === 'desc') {
+    return sortedData.reverse()
+  }
+
+  return sortedData;
+}
+
 
 function App() {
   // State hook for table column names
   const [tableColumns, setTableColumns] = useState([]);
   // State hook for table values
   const [values, setValues] = useState([]);
+  // State hook for the sort key (i.e. sort column), defaulted to null (i.e. unsorted)
+  const [sortKey, setSortKey] = useState()
+  // State hook for the sort order, defaulted to ascending
+  const [sortOrder, setSortOrder] = useState('asc')
 
-  // Handler to parse the uploaded CSV & set table column and value state hooks
+
+  // Parses the uploaded CSV & sets table column and value state hooks
   const uploadHandler = (event) => {
-    Papa.parse(event.target.files[0], {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        const columnsArray = [];
-        const valuesArray = [];
+    if (event.target.files[0]) {
+      Papa.parse(event.target.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const columnsArray = [];
+          const valuesArray = [];
 
-        results.data.forEach((d) => {
-          columnsArray.push(Object.keys(d));
-          valuesArray.push(Object.values(d));
+          results.data.forEach((d) => {
+            columnsArray.push(Object.keys(d));
+            valuesArray.push(Object.values(d));
+        });
+
+          setTableColumns(columnsArray[0]);
+
+          setValues(valuesArray);
+        },
       });
-
-        setTableColumns(columnsArray[0]);
-
-        setValues(valuesArray);
-      },
-    });
+    }
   };
 
-  // Converting the data back into CSV for export
+
+  // Converts the data back into CSV for export
   const csv = Papa.unparse({
     "fields": tableColumns,
     "data": values,
   },{
     header: true,
+    delimiter: ";",
   });
+
+
+  // Calls the sortData function any time values, sortKey, or sortOrder change
+  const sortedValues = useCallback(
+    () => sortData(values, sortKey, sortOrder),
+    [values, sortKey, sortOrder]
+  )
+
+
+  // Changes the sortKey and/or sortOrder when the ▲ or ▼ buttons are pressed
+  function changeSort(key) {
+    if (key === sortKey) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortKey(key)
+      setSortOrder('asc')
+    }
+  }
+
 
   return (
     <>
-      <div className="file-upload">
-        <h1>CSV Viewer & Editor</h1>
-        <h3>{tableColumns[0] ? "Select a new file to upload": "Select a file to upload"}</h3>
+      <div className="title-section">
+        <h1>CSV Viewer</h1>
+        <h3>Select a file to view, sort, and download</h3>
+        <label
+          className="active-file-upload-download"
+          htmlFor="file-upload">
+          <u>↑</u> Choose File
+        </label>
         <input
+          id="file-upload"
           type="file"
-          name="file"
           accept=".csv"
           onChange={uploadHandler}
         />
-        <CSVLink filename="data.csv" data={csv}>Download CSV</CSVLink>
+        <CSVLink
+          className={sortedValues()[0] ? "active-file-upload-download" : "innactive-button"}
+          filename="data.csv"
+          data={csv}>
+          <u>↓</u> Download CSV
+        </CSVLink>
       </div>
       <div className="data-table">
-        <table>
+        <table cellspacing="0">
           <thead>
             <tr>
               {tableColumns.map((column, idx) => {
-                return <th key={idx}>{column}</th>
+                return (
+                  <th key={idx}>
+                    {column}
+                    <button
+                      onClick={() => changeSort(idx)}>
+                      {(idx === sortKey && sortOrder === 'desc') ? '▼' : '▲'}
+                    </button>
+                  </th>
+                );
               })}
             </tr>
           </thead>
           <tbody>
-              {values.map((value, idx) => {
+              {sortedValues().map((value, idx) => {
                 return (
                   <tr key={idx}>
                     {value.map((val, idx2) => {
